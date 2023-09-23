@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<ruleset name="ProjectName">
+    <description>The coding standard for the Simple Blog API</description>
+    <file>app</file>
+    <file>tests</file>
+    <rule ref="PSR2"/>
+</ruleset>
