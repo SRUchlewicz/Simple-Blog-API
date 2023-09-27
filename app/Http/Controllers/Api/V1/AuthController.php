@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\V1\ApiController;
 use App\Contracts\Http\V1\AuthControllerInterface;
-use App\Services\AuthService;
+use App\Contracts\Services\AuthServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
@@ -12,10 +12,11 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends ApiController implements AuthControllerInterface
 {
-    protected $authService;
+    private $authService;
 
-    public function __construct(AuthService $authService)
-    {
+    public function __construct(
+        AuthServiceInterface $authService
+    ) {
         $this->authService = $authService;
     }
 

@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Contracts\RoleRepositoryInterface;
+use App\Contracts\Repositories\RoleRepositoryInterface;
 use App\Models\Role;
 
 class EloquentRoleRepository implements RoleRepositoryInterface

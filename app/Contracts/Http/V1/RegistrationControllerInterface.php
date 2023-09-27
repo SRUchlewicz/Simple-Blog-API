@@ -2,7 +2,7 @@
 
 namespace App\Contracts\Http\V1;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\RegisterUserRequest;
 use Illuminate\Http\JsonResponse;
 
 interface RegistrationControllerInterface
@@ -17,18 +17,24 @@ interface RegistrationControllerInterface
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="User registered successfully"
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Bad Request"
+     *         description="User registered successfully",
+     *         @OA\JsonContent()
      *     ),
      *     @OA\Response(
      *         response=422,
-     *         description="Validation Error"
+     *         description="Validation Error",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="An error occurred"),
+     *             @OA\Property(property="error", type="string", example="Error description here")
+     *         )
      *     )
      * )
      */
-    public function register(Request $request): JsonResponse;
+    public function register(RegisterUserRequest $request): JsonResponse;
  
 }

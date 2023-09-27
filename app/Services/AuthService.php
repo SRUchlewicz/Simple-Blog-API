@@ -2,20 +2,19 @@
 
 namespace App\Services;
 
-use App\Contracts\AuthServiceInterface;
-use App\Contracts\UserRepositoryInterface;
-use App\Models\User;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Contracts\Services\AuthServiceInterface;
+use App\Contracts\Services\TokenServiceInterface;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Validation\ValidationException;
 
 class AuthService implements AuthServiceInterface
 {
-    private $userRepository;
+    private $tokenService;
 
-    public function __construct(UserRepositoryInterface $userRepository)
-    {
-        $this->userRepository = $userRepository;
+    public function __construct(
+        TokenServiceInterface $tokenService
+    ) {
+        $this->tokenService = $tokenService;
     }
 
     /**
@@ -26,7 +25,7 @@ class AuthService implements AuthServiceInterface
      */
     public function login(array $credentials): string
     {
-        if (! $token = JWTAuth::attempt($credentials)) {
+        if (! $token = $this->tokenService->create($credentials)) {
             throw ValidationException::withMessages([
                 'credentials' => ['These credentials do not match our records.'],
             ]);
@@ -42,6 +41,6 @@ class AuthService implements AuthServiceInterface
      */
     public function logout(): void
     {
-        JWTAuth::invalidate(JWTAuth::getToken());
+        $this->tokenService->invalidate();
     }
 }

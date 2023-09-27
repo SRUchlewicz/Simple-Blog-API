@@ -2,11 +2,9 @@
 
 namespace App\Services;
 
-use App\Contracts\UserServiceInterface;
-use App\Contracts\UserRepositoryInterface;
-use App\Contracts\RoleRepositoryInterface;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
+use App\Contracts\Services\UserServiceInterface;
+use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Contracts\Repositories\RoleRepositoryInterface;
 use App\Models\User;
 use App\Exceptions\UserNotFoundException;
 
@@ -25,16 +23,6 @@ class UserService implements UserServiceInterface
 
     public function register(array $data): User
     {
-        $validator = Validator::make($data, [
-            'firstname' => 'required|string|between:3,15',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8'
-        ]);
-
-        if ($validator->fails()) {
-            throw new ValidationException($validator);
-        }
-
         return $this->userRepository->create([
             'firstname' => $data['firstname'],
             'email' => $data['email'],
@@ -69,5 +57,16 @@ class UserService implements UserServiceInterface
         }
 
         $this->userRepository->delete($user);
+    }
+
+    public function changeUserPassword(string $email, string $newPass): void
+    {
+        $user = $this->userRepository->findByEmail($email);
+
+        if (!$user) {
+            throw new UserNotFoundException("User with email {$email} not found");
+        }
+
+        $this->userRepository->update($user, ['password' => bcrypt($newPass)]);
     }
 }

@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\V1\ApiController;
 use App\Contracts\Http\V1\RegistrationControllerInterface;
-use App\Contracts\UserServiceInterface;
-use Illuminate\Http\Request;
+use App\Contracts\Services\UserServiceInterface;
+use App\Http\Requests\RegisterUserRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\ValidationException;
+use Exception;
 
 class RegistrationController extends ApiController implements RegistrationControllerInterface
 {
-    protected $userService;
+    private $userService;
 
     public function __construct(
         UserServiceInterface $userService
@@ -22,14 +22,13 @@ class RegistrationController extends ApiController implements RegistrationContro
     /**
      * {@inheritdoc}
      */
-    public function register(Request $request): JsonResponse
+    public function register(RegisterUserRequest $request): JsonResponse
     {
         try {
-            $this->userService->register($request->all());
+            $this->userService->register($request->validated());
             return response()->json(['message' => 'User registered successfully'], 201);
-        } catch (ValidationException $e) {
-            return response()->json(['errors' => $e->errors()], 422);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'An error occurred', 'error' => $e->getMessage()], 500);
         }
-        
     }
 }

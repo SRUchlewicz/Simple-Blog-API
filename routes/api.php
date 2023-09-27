@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\RegistrationController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\ResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,8 @@ use App\Http\Controllers\Api\V1\AuthController;
 Route::prefix('v1')->group(function () {
     // Authentication routes
     Route::post('register', [RegistrationController::class, 'register'])->name('Register');
+    Route::post('forgot-password', [ResetPasswordController::class, 'forgotPassword'])->name('Forgot Password');
+    Route::post('reset-password', [ResetPasswordController::class, 'resetPassword'])->name('Reset Password');
     Route::post('login', [AuthController::class, 'login'])->name('Login');
 
     Route::group(['middleware' => ['jwt.auth']], function () {
