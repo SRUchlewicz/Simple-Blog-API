@@ -11,6 +11,7 @@ interface RegistrationControllerInterface
      * @OA\Post(
      *     path="/api/v1/register",
      *     summary="Register a new user",
+     *     tags={"Account"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(ref="#/components/schemas/User")
@@ -18,7 +19,14 @@ interface RegistrationControllerInterface
      *     @OA\Response(
      *         response=201,
      *         description="User registered successfully",
-     *         @OA\JsonContent()
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="User registered successfully"
+     *             )
+     *         )
      *     ),
      *     @OA\Response(
      *         response=422,
@@ -29,12 +37,14 @@ interface RegistrationControllerInterface
      *         response=500,
      *         description="Internal Server Error",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="An error occurred"),
-     *             @OA\Property(property="error", type="string", example="Error description here")
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="An error occurred"
+     *             )
      *         )
      *     )
      * )
      */
     public function register(RegisterUserRequest $request): JsonResponse;
- 
 }

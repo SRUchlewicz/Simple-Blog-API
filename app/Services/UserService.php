@@ -7,6 +7,7 @@ use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Contracts\Repositories\RoleRepositoryInterface;
 use App\Models\User;
 use App\Exceptions\UserNotFoundException;
+use Illuminate\Support\Facades\Hash;
 
 class UserService implements UserServiceInterface
 {
@@ -26,7 +27,7 @@ class UserService implements UserServiceInterface
         return $this->userRepository->create([
             'firstname' => $data['firstname'],
             'email' => $data['email'],
-            'password' => bcrypt($data['password']),
+            'password' => Hash::make($data['password']),
             'role_id' => $this->roleRepository->getDefaultRoleId()
         ]);
     }
@@ -59,6 +60,9 @@ class UserService implements UserServiceInterface
         $this->userRepository->delete($user);
     }
 
+    /**
+     * @throws UserNotFoundException
+     */
     public function changeUserPassword(string $email, string $newPass): void
     {
         $user = $this->userRepository->findByEmail($email);
@@ -67,6 +71,6 @@ class UserService implements UserServiceInterface
             throw new UserNotFoundException("User with email {$email} not found");
         }
 
-        $this->userRepository->update($user, ['password' => bcrypt($newPass)]);
+        $this->userRepository->update($user, ['password' => Hash::make($newPass)]);
     }
 }

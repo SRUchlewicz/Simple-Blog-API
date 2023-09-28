@@ -16,5 +16,4 @@ interface AuthServiceInterface
      * @throws JWTException
      */
     public function logout(): void;
-
 }

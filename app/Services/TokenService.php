@@ -4,12 +4,16 @@ namespace App\Services;
 
 use App\Contracts\Services\TokenServiceInterface;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use App\Models\RevokedToken;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use App\Exceptions\InvalidTokenException;
 use App\Contracts\Repositories\UserRepositoryInterface;
+use Tymon\JWTAuth\Payload;
 
 class TokenService implements TokenServiceInterface
 {
+    public const RESET_PASSWORD_TOKEN_ACTION_KEY = 'password_reset';
+
     private $userRepository;
 
     public function __construct(
@@ -21,87 +25,87 @@ class TokenService implements TokenServiceInterface
     /**
      * @throws JWTException
      */
-    public function invalidate(): void
+    public function createAuthToken(array $credentials): ?string
     {
-        JWTAuth::invalidate(JWTAuth::getToken());
-        //$this->revokeTokenInDb(); //TODO implement revoke logic
-    }
-
-    private function revokeTokenInDb(): void
-    {
-        $userId = auth()->user()->id;
-        $jti = JWTAuth::getPayload(JWTAuth::getToken())['jti'];
-        RevokedToken::create(['user_id' => $userId, 'jti' => $jti]);
-    }
-
-    public function generateResetPasswordToken(string $email): string
-    {
-        $user = $this->userRepository->findByEmail($email);
-        $customClaims = ['email' => $email, 'action' => 'password_reset', 'exp' => strtotime('+1 hour')];
-        return JWTAuth::customClaims($customClaims)->fromUser($user);
-    }
-    
-    public function validateToken(string $token)
-    {
-        //$token = $request->input('token');
-        try {
-            $userId = auth()->user()->id;
-            $decoded = JWTAuth::setToken($token)->getPayload();
-            $jti = $decoded['jti'];
-            // Check if the token is in the revoked_tokens table
-            if (RevokedToken::where('jti', $jti)->where('user_id', $userId)->exists()) {
-                return response()->json(['error' => 'Token has been revoked.']);
-            }
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Invalid token.']);
-        }
-    }
-
-    public function validateResetPasswordToken(string $token): bool
-    {
-        try {
-            $decoded = JWTAuth::setToken($token)->getPayload();
-        } catch (\Exception $e) {
-            // Token invalid or expired
-            return false;
-            return response()->json(['error' => 'Invalid token.']);
-        }
-
-        $email = $decoded['email'];
-        $action = $decoded['action'];
-        $exp = $decoded['exp'];
-
-        if ($action !== 'password_reset') {
-            return false;
-            return response()->json(['error' => 'Invalid action.']);
-        }
-
-        if ($exp < time()) {
-            return false;
-            return response()->json(['error' => 'Token expired.']);
-        }
-
-        return true;
-    }
-
-    public function getEmailFromToken(string $token): ?string
-    {
-        try {
-            $decoded = JWTAuth::setToken($token)->getPayload();
-        } catch (\Exception $e) {
-            // Token invalid or expired
-            return false;
-            return response()->json(['error' => 'Invalid token.']);
-        }
-
-        return $decoded['email'] ?? null;
+        return JWTAuth::attempt($credentials);
     }
 
     /**
      * @throws JWTException
      */
-    public function create(array $credentials): ?string
+    public function invalidate(?string $token = null): void
     {
-        return JWTAuth::attempt($credentials);
+        if (!$token) {
+            $token = JWTAuth::getToken();
+        }
+
+        JWTAuth::invalidate(JWTAuth::getToken());
+        //$this->revokeTokenInDb(); // TODO implement revoke logic
+    }
+
+    public function createResetPasswordToken(string $email): string
+    {
+        $user = $this->userRepository->findByEmail($email);
+        $customClaims = [
+            'email' => $email,
+            'action' => self::RESET_PASSWORD_TOKEN_ACTION_KEY,
+            'exp' => now()->addMinutes($this->getResetPasswordTokenTTL())->timestamp
+        ];
+
+        return JWTAuth::customClaims($customClaims)->fromUser($user);
+    }
+
+    /**
+     * @throws InvalidTokenException
+     */
+    public function validateResetPasswordToken(string $token): void
+    {
+        try {
+            $tokenData = $this->getDataFromToken($token);
+        } catch(TokenExpiredException $e) {
+            throw new InvalidTokenException("The reset password token has expired");
+        } catch (JWTException $e) {
+            throw new InvalidTokenException("The reset password token is invalid");
+        }
+
+        if ($tokenData['action'] !== self::RESET_PASSWORD_TOKEN_ACTION_KEY) {
+            throw new InvalidTokenException("The token is invalid for reset password");
+        }
+    }
+    
+    /**
+     * @throws InvalidTokenException
+     */
+    public function getEmailFromToken(string $token): string
+    {
+        try {
+            $tokenData = $this->getDataFromToken($token);
+        } catch (JWTException $e) {
+            throw new InvalidTokenException("The token is invalid");
+        }
+
+        if (!isset($tokenData['email'])) {
+            throw new InvalidTokenException("The token does not have email data");
+        }
+
+        return $tokenData['email'];
+    }
+
+    /**
+     * @throws JWTException
+     */
+    private function getDataFromToken(string $token): Payload
+    {
+        return JWTAuth::setToken($token)->getPayload();
+    }
+
+    private function getResetPasswordTokenTTL(): int
+    {
+        return (int) env('RESET_PASSWORD_TOKEN_TTL', 10);
+    }
+
+    private function revokeTokenInDb(): void
+    {
+        // TODO implement revoke logic
     }
 }

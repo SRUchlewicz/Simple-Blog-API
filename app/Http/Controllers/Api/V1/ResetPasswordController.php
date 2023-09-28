@@ -5,65 +5,56 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\V1\ApiController;
 use App\Contracts\Http\V1\ResetPasswordControllerInterface;
 use App\Contracts\Services\ResetPasswordServiceInterface;
+use App\Contracts\Services\TokenServiceInterface;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use Illuminate\Http\JsonResponse;
 use Exception;
-
+use App\Exceptions\InvalidTokenException;
+use Illuminate\Support\Facades\Log;
 
 class ResetPasswordController extends ApiController implements ResetPasswordControllerInterface
 {
     private $resetPasswordService;
+    private $tokenService;
 
     public function __construct(
-        ResetPasswordServiceInterface $resetPasswordService
+        ResetPasswordServiceInterface $resetPasswordService,
+        TokenServiceInterface $tokenService
     ) {
         $this->resetPasswordService = $resetPasswordService;
+        $this->tokenService = $tokenService;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
         try {
             $this->resetPasswordService->sendResetToken($request->validated()['email']);
-            return response()->json(['message' => 'Reset token sent']);
+            return response()->json(['message' => 'Reset token sent'], 200);
         } catch (Exception $e) {
-            return response()->json(['message' => 'An error occurred', 'error' => $e->getMessage()], 500);
+            Log::error('An error occured during forgot password: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred'], 500);
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
         try {
             $data = $request->validated();
             $this->resetPasswordService->resetPassword($data['token'], $data['password']);
-            return response()->json(['message' => 'Password reset successfully']);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'An error occurred', 'error' => $e->getMessage()], 500);
+            $this->tokenService->invalidate($data['token']);
+            return response()->json(['message' => 'Password reset successfully'], 200);
+        } catch (InvalidTokenException $e) {
+            return response()->json(['message' => 'Invalid Token', 'error' => $e->getMessage()], 400);
+        } catch (Exception $e) {
+            Log::error('An error occured during password reset: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred'], 500);
         }
-    }
-
-    public function verifyToken(ResetPasswordRequest $request)
-    {
-        $token = $request->input('token');
-        try {
-            $decoded = JWTAuth::setToken($token)->getPayload();
-        } catch (\Exception $e) {
-            // Token invalid or expired
-            return response()->json(['error' => 'Invalid token.']);
-        }
-
-        $email = $decoded['email'];
-        $action = $decoded['action'];
-        $exp = $decoded['exp'];
-
-        if ($action !== 'password_reset') {
-            return response()->json(['error' => 'Invalid action.']);
-        }
-
-        if ($exp < time()) {
-            return response()->json(['error' => 'Token expired.']);
-        }
-
-        // Proceed with password reset for $email
     }
 }

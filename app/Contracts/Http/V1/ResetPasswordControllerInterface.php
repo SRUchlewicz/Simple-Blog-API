@@ -12,6 +12,7 @@ interface ResetPasswordControllerInterface
      * @OA\Post(
      *     path="/api/v1/forgot-password",
      *     summary="Forgot Password",
+     *     tags={"Account"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -24,14 +25,28 @@ interface ResetPasswordControllerInterface
      *         )
      *     ),
      *     @OA\Response(
-     *         response=201,
-     *         description="User registered successfully",
-     *         @OA\JsonContent()
+     *         response=200,
+     *         description="Reset token sent",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Reset token sent"
+     *             )
+     *         )
      *     ),
      *     @OA\Response(
-     *         response=422,
-     *         description="Validation Error",
-     *         @OA\JsonContent()
+     *         response=500,
+     *         description="Internal Server Error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="An error occured"
+     *             )
+     *         )
      *     )
      * )
      */
@@ -41,6 +56,7 @@ interface ResetPasswordControllerInterface
      * @OA\Post(
      *     path="/api/v1/reset-password",
      *     summary="Reset Password",
+     *     tags={"Account"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -58,17 +74,47 @@ interface ResetPasswordControllerInterface
      *         )
      *     ),
      *     @OA\Response(
-     *         response=201,
-     *         description="User registered successfully",
-     *         @OA\JsonContent()
+     *         response=200,
+     *         description="Password reset successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Password reset successfully"
+     *             )
+     *         )
      *     ),
      *     @OA\Response(
-     *         response=422,
-     *         description="Validation Error",
-     *         @OA\JsonContent()
+     *         response=400,
+     *         description="Invalid Token",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Invalid Token"
+     *             ),
+     *             @OA\Property(
+     *                 property="error",
+     *                 type="string",
+     *                 example="Error Message"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="An error occured"
+     *             )
+     *         )
      *     )
      * )
      */
     public function resetPassword(ResetPasswordRequest $request): JsonResponse;
- 
 }

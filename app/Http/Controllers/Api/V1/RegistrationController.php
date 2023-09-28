@@ -8,6 +8,7 @@ use App\Contracts\Services\UserServiceInterface;
 use App\Http\Requests\RegisterUserRequest;
 use Illuminate\Http\JsonResponse;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class RegistrationController extends ApiController implements RegistrationControllerInterface
 {
@@ -28,7 +29,8 @@ class RegistrationController extends ApiController implements RegistrationContro
             $this->userService->register($request->validated());
             return response()->json(['message' => 'User registered successfully'], 201);
         } catch (Exception $e) {
-            return response()->json(['message' => 'An error occurred', 'error' => $e->getMessage()], 500);
+            Log::error('An error occurred during registration: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred'], 500);
         }
     }
 }

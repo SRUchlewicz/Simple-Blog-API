@@ -18,14 +18,12 @@ class AuthService implements AuthServiceInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws ValidationException
      * @throws JWTException
      */
     public function login(array $credentials): string
     {
-        if (! $token = $this->tokenService->create($credentials)) {
+        if (! $token = $this->tokenService->createAuthToken($credentials)) {
             throw ValidationException::withMessages([
                 'credentials' => ['These credentials do not match our records.'],
             ]);
@@ -35,8 +33,6 @@ class AuthService implements AuthServiceInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws JWTException
      */
     public function logout(): void

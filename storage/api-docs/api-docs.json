@@ -12,6 +12,9 @@
     "paths": {
         "/api/v1/login": {
             "post": {
+                "tags": [
+                    "Authentication"
+                ],
                 "summary": "Log in a user",
                 "operationId": "a1c1de275a4aab08aeca001ab85e1db9",
                 "requestBody": {
@@ -26,10 +29,52 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Logged in successfully"
+                        "description": "Logged in successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "token here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid Credentials"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Could not create token"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -58,31 +103,15 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "type": "string",
-                                            "example": "could_not_invalidate_token"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "error": {
+                                        "message": {
                                             "type": "string",
-                                            "example": "could_not_invalidate_token"
+                                            "example": "Could not invalidate token"
                                         }
                                     },
                                     "type": "object"
@@ -100,6 +129,9 @@
         },
         "/api/v1/register": {
             "post": {
+                "tags": [
+                    "Account"
+                ],
                 "summary": "Register a new user",
                 "operationId": "9528eaf2421799febedaa468ca90d844",
                 "requestBody": {
@@ -117,7 +149,15 @@
                         "description": "User registered successfully",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User registered successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     },
@@ -138,10 +178,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "An error occurred"
-                                        },
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Error description here"
                                         }
                                     },
                                     "type": "object"
@@ -154,6 +190,9 @@
         },
         "/api/v1/forgot-password": {
             "post": {
+                "tags": [
+                    "Account"
+                ],
                 "summary": "Forgot Password",
                 "operationId": "b60bd03bf87eecfc693e79bb2e904400",
                 "requestBody": {
@@ -176,19 +215,35 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "User registered successfully",
+                    "200": {
+                        "description": "Reset token sent",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Reset token sent"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     },
-                    "422": {
-                        "description": "Validation Error",
+                    "500": {
+                        "description": "Internal Server Error",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "An error occured"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     }
@@ -197,6 +252,9 @@
         },
         "/api/v1/reset-password": {
             "post": {
+                "tags": [
+                    "Account"
+                ],
                 "summary": "Reset Password",
                 "operationId": "45382adf76f04d0a2303e31042208211",
                 "requestBody": {
@@ -224,19 +282,55 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "User registered successfully",
+                    "200": {
+                        "description": "Password reset successfully",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Password reset successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     },
-                    "422": {
-                        "description": "Validation Error",
+                    "400": {
+                        "description": "Invalid Token",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid Token"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error Message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "An error occured"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     }

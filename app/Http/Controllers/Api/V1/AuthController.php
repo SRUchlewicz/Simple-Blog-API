@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends ApiController implements AuthControllerInterface
 {
@@ -29,9 +30,10 @@ class AuthController extends ApiController implements AuthControllerInterface
             $token = $this->authService->login($request->all());
             return response()->json(['token' => $token], 200);
         } catch (ValidationException $e) {
-            return response()->json(['error' => 'Invalid credentials'], 401);
+            return response()->json(['message' => 'Invalid credentials'], 401);
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+            Log::error('An error occured during login: ' . $e->getMessage());
+            return response()->json(['message' => 'Could not create token'], 500);
         }
     }
     
@@ -42,9 +44,10 @@ class AuthController extends ApiController implements AuthControllerInterface
     {
         try {
             $this->authService->logout();
-            return response()->json(['message' => 'Logged out successfully']);
+            return response()->json(['message' => 'Logged out successfully'], 200);
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not invalidate token'], 500);
+            Log::error('An error occured during logout: ' . $e->getMessage());
+            return response()->json(['message' => 'Could not invalidate token'], 500);
         }
     }
 }
