@@ -14,7 +14,7 @@ interface RegistrationControllerInterface
      *     tags={"Account"},
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/User")
+     *         @OA\JsonContent(ref="#/components/schemas/RegisterUser")
      *     ),
      *     @OA\Response(
      *         response=201,

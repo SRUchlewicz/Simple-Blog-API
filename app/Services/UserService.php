@@ -8,6 +8,8 @@ use App\Contracts\Repositories\RoleRepositoryInterface;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class UserService implements UserServiceInterface
 {
@@ -22,13 +24,31 @@ class UserService implements UserServiceInterface
         $this->roleRepository = $roleRepository;
     }
 
-    public function registerUser(array $data): User
+    public function getAllUsers(): Collection
+    {
+        return $this->userRepository->getAll();
+    }
+
+    public function getUsersByPage(?int $page = 1): LengthAwarePaginator
+    {
+        return $this->userRepository->getPaginated($page, getDefaultPerPage());
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function getUserById(int $id): User
+    {
+        return $this->userRepository->getById($id);
+    }
+
+    public function createUser(array $data): User
     {
         return $this->userRepository->create([
             'firstname' => $data['firstname'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role_id' => $this->roleRepository->getDefaultRoleId()
+            'role_id' => isset($data['role_id']) ? $data['role_id'] : $this->roleRepository->getDefaultRoleId()
         ]);
     }
 
@@ -37,6 +57,10 @@ class UserService implements UserServiceInterface
      */
     public function updateUser(int $id, array $data): User
     {
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']); // TODO make some function that will prepare data instead of this
+        }
+        
         return $this->userRepository->update($id, $data);
     }
 

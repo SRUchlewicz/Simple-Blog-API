@@ -12,8 +12,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PostService implements PostServiceInterface
 {
-    public const NUMBER_OF_POSTS_PER_PAGE_CONFIG_KEY = 'custom.posts_per_page';
-
     private $postRepository;
 
     public function __construct(
@@ -29,7 +27,7 @@ class PostService implements PostServiceInterface
 
     public function getPostsByPage(?int $page = 1): LengthAwarePaginator
     {
-        return $this->postRepository->getPaginated($page, $this->getNumberOfPostsPerPage());
+        return $this->postRepository->getPaginated($page, getDefaultPerPage());
     }
 
     /**
@@ -85,10 +83,5 @@ class PostService implements PostServiceInterface
     public function deletePost(int $id): void
     {
         $this->postRepository->delete($id);
-    }
-
-    private function getNumberOfPostsPerPage(): int
-    {
-        return (int) config(self::NUMBER_OF_POSTS_PER_PAGE_CONFIG_KEY);
     }
 }

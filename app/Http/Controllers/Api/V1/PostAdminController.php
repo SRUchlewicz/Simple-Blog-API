@@ -11,7 +11,6 @@ use Illuminate\Http\JsonResponse;
 use App\Contracts\Services\PostServiceInterface;
 use Exception;
 use Illuminate\Support\Facades\Log;
-use App\Models\Post;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PostAdminController extends ApiController implements PostAdminControllerInterface

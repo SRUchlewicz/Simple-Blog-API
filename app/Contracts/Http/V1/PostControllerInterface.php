@@ -27,8 +27,16 @@ interface PostControllerInterface
      *         response=200,
      *         description="Successful operation",
      *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/Post")
+     *             type="object",
+     *             @OA\Property(
+     *                 property="posts",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(ref="#/components/schemas/Post")
+     *                 )
+     *             )      
      *         )
      *     ),
      *     @OA\Response(

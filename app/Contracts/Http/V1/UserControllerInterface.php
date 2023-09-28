@@ -3,19 +3,19 @@
 namespace App\Contracts\Http\V1;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\StorePostRequest;
-use App\Http\Requests\UpdatePostRequest;
 
-interface PostAdminControllerInterface
+interface UserControllerInterface
 {
     /**
      * @OA\Get(
-     *     path="/api/v1/admin/posts",
-     *     tags={"Admin","Posts"},
-     *     summary="Get list of posts",
-     *     description="Returns list of posts with pagination",
-     *     operationId="getPostsAdmin",
+     *     path="/api/v1/admin/users",
+     *     tags={"Admin","Users"},
+     *     summary="Get list of users",
+     *     description="Returns list of users with pagination",
+     *     operationId="getUsers",
      *     security={{"Bearer":{}}},
      *     @OA\Parameter(
      *         name="page",
@@ -32,12 +32,12 @@ interface PostAdminControllerInterface
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(
-     *                 property="posts",
+     *                 property="users",
      *                 type="object",
      *                 @OA\Property(
      *                     property="data",
      *                     type="array",
-     *                     @OA\Items(ref="#/components/schemas/Post")
+     *                     @OA\Items(ref="#/components/schemas/User")
      *                 )
      *             )      
      *         )
@@ -83,33 +83,37 @@ interface PostAdminControllerInterface
 
     /**
      * @OA\Post(
-     *     path="/api/v1/admin/posts",
-     *     tags={"Admin","Posts"},
-     *     summary="Create a new post",
-     *     description="Creates a new post.",
-     *     operationId="storePost",
+     *     path="/api/v1/admin/users",
+     *     tags={"Admin","Users"},
+     *     summary="Create a new user",
+     *     description="Creates a new user.",
+     *     operationId="storeUser",
      *     security={{"Bearer":{}}},
      *     @OA\RequestBody(
      *         required=true,
-     *         description="Post data",
+     *         description="User data",
      *         @OA\JsonContent(
      *             type="object",
-     *             required={"title", "body"},
+     *             required={"firstname", "email", "password", "rule_id"},
      *             @OA\Property(
-     *                 property="title",
+     *                 property="firstname",
      *                 type="string",
-     *                 description="The title of the post"
+     *                 format="string"
      *             ),
      *             @OA\Property(
-     *                 property="body",
+     *                 property="email",
      *                 type="string",
-     *                 description="The body content of the post"
+     *                 format="email"
      *             ),
      *             @OA\Property(
-     *                 property="media_ids",
-     *                 type="array",
-     *                 @OA\Items(type="integer"),
-     *                 description="Array of media IDs associated with the post"
+     *                 property="password",
+     *                 type="string",
+     *                 format="password"
+     *             ),
+     *             @OA\Property(
+     *                 property="role_id",
+     *                 type="integer",
+     *                 format="integer"
      *             )
      *         )
      *     ),
@@ -121,7 +125,7 @@ interface PostAdminControllerInterface
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
-     *                 example="Post created successfully"
+     *                 example="User created successfully"
      *             )
      *         )
      *     ),
@@ -163,15 +167,15 @@ interface PostAdminControllerInterface
      *     )
      * )
      */
-    public function store(StorePostRequest $request): JsonResponse;
+    public function store(StoreUserRequest $request): JsonResponse;
 
     /**
      * @OA\Get(
-     *     path="/api/v1/admin/posts/{id}",
-     *     tags={"Admin","Posts"},
-     *     summary="Get post details for editing",
-     *     description="Returns the details of the post for editing.",
-     *     operationId="editPost",
+     *     path="/api/v1/admin/users/{id}",
+     *     tags={"Admin","Users"},
+     *     summary="Get user details for editing",
+     *     description="Returns the details of the user for editing.",
+     *     operationId="editUser",
      *     security={{"Bearer":{}}},
      *     @OA\Parameter(
      *         name="id",
@@ -182,7 +186,13 @@ interface PostAdminControllerInterface
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
-     *         @OA\JsonContent(ref="#/components/schemas/Post")
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="user",
+     *                 ref="#/components/schemas/User"
+     *             )
+     *         )
      *     ),
      *     @OA\Response(
      *         response=401,
@@ -216,7 +226,7 @@ interface PostAdminControllerInterface
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
-     *                 example="Post not found"
+     *                 example="User not found"
      *             )
      *         )
      *     ),
@@ -235,14 +245,14 @@ interface PostAdminControllerInterface
      * )
      */
     public function edit(int $id): JsonResponse;
-    
+
     /**
      * @OA\Put(
-     *     path="/api/v1/admin/posts/{id}",
-     *     tags={"Admin","Posts"},
-     *     summary="Update an existing post",
-     *     description="Updates an existing post.",
-     *     operationId="updatePost",
+     *     path="/api/v1/admin/users/{id}",
+     *     tags={"Admin","Users"},
+     *     summary="Update an existing user",
+     *     description="Updates an existing user.",
+     *     operationId="updateUser",
      *     security={{"Bearer":{}}},
      *     @OA\Parameter(
      *         name="id",
@@ -251,27 +261,29 @@ interface PostAdminControllerInterface
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\RequestBody(
-     *         description="Updated post object",
+     *         description="Updated user object",
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"title", "body"},
+     *             required={"firstname", "email", "password", "rule_id"},
      *             @OA\Property(
-     *                 property="title",
+     *                 property="firstname",
      *                 type="string",
-     *                 description="The title of the post",
-     *                 example="My new title"
+     *                 format="string"
      *             ),
      *             @OA\Property(
-     *                 property="body",
+     *                 property="email",
      *                 type="string",
-     *                 description="The body content of the post",
-     *                 example="This is the updated body of the post."
+     *                 format="email"
      *             ),
      *             @OA\Property(
-     *                 property="media_ids",
-     *                 type="array",
-     *                 @OA\Items(type="integer"),
-     *                 description="Array of media IDs associated with the post",
+     *                 property="password",
+     *                 type="string",
+     *                 format="password"
+     *             ),
+     *             @OA\Property(
+     *                 property="role_id",
+     *                 type="integer",
+     *                 format="integer"
      *             )
      *         )
      *     ),
@@ -283,7 +295,7 @@ interface PostAdminControllerInterface
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
-     *                 example="Post updated successfully"
+     *                 example="User updated successfully"
      *             )
      *         )
      *     ),
@@ -319,7 +331,7 @@ interface PostAdminControllerInterface
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
-     *                 example="Post not found"
+     *                 example="User not found"
      *             )
      *         )
      *     ),
@@ -337,15 +349,15 @@ interface PostAdminControllerInterface
      *     )
      * )
      */
-    public function update(int $id, UpdatePostRequest $request): JsonResponse;
+    public function update(int $id, UpdateUserRequest $request): JsonResponse;
 
     /**
      * @OA\Delete(
-     *     path="/api/v1/admin/posts/{id}",
-     *     tags={"Admin","Posts"},
-     *     summary="Delete a post",
-     *     description="Deletes a post and returns a success message.",
-     *     operationId="deletePost",
+     *     path="/api/v1/admin/users/{id}",
+     *     tags={"Admin","Users"},
+     *     summary="Delete a user",
+     *     description="Deletes a user and returns a success message.",
+     *     operationId="deleteUser",
      *     security={{"Bearer":{}}},
      *     @OA\Parameter(
      *         name="id",
@@ -361,7 +373,7 @@ interface PostAdminControllerInterface
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
-     *                 example="Post deleted successfully"
+     *                 example="User deleted successfully"
      *             )
      *         )
      *     ),
@@ -397,7 +409,7 @@ interface PostAdminControllerInterface
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
-     *                 example="Post not found"
+     *                 example="User not found"
      *             )
      *         )
      *     ),

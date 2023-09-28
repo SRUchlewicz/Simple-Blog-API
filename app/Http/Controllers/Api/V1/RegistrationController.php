@@ -26,7 +26,7 @@ class RegistrationController extends ApiController implements RegistrationContro
     public function register(RegisterUserRequest $request): JsonResponse
     {
         try {
-            $this->userService->registerUser($request->validated());
+            $this->userService->createUser($request->validated());
             return response()->json(['message' => 'User registered successfully'], 201);
         } catch (Exception $e) {
             Log::error('An error occurred during registration: ' . $e->getMessage());

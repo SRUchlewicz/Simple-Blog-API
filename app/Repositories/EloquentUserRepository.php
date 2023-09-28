@@ -4,16 +4,28 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EloquentUserRepository implements UserRepositoryInterface
 {
+    public function getAll(): Collection
+    {
+        return User::with('role')->all();
+    }
+
+    public function getPaginated(?int $page = 1, ?int $perPage = 10): LengthAwarePaginator
+    {
+        return User::with('role')->paginate($perPage, ['*'], 'page', $page);
+    }
+
     /**
      * @throws ModelNotFoundException
      */
     public function getById(int $id): User
     {
-        return User::findOrFail($id);
+        return User::with('role')->findOrFail($id);
     }
 
     /**
@@ -21,7 +33,7 @@ class EloquentUserRepository implements UserRepositoryInterface
      */
     public function getByEmail(string $email): User
     {
-        return User::where('email', $email)->firstOrFail();
+        return User::with('role')->where('email', $email)->firstOrFail();
     }
 
     public function create(array $data): User

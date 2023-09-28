@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\ResetPasswordController;
 use App\Http\Controllers\Api\V1\PostController;
 use App\Http\Controllers\Api\V1\PostAdminController;
 use App\Http\Controllers\Api\V1\MediaController;
+use App\Http\Controllers\Api\V1\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,24 +48,14 @@ Route::prefix('v1')->group(function () {
             });
     
             Route::group(['middleware' => ['role:admin']], function () {
-    
+                Route::get('users', [UserController::class, 'index']);
+                Route::post('users', [UserController::class, 'store'])->name('Create User');
+                Route::get('users/{id}', [UserController::class, 'edit'])->name('Edit User');
+                Route::put('users/{id}', [UserController::class, 'update'])->name('Update User');
+                Route::delete('users/{id}', [UserController::class, 'destroy'])->name('Delete User');
+                Route::post('users/role', [UserController::class, 'role'])->name('Change User Role');
             });
         });
-       
-        
-       
-
-        // User actions
-        //Route::get('me', 'AuthController@me');
-        //Route::put('users/{id}', 'UserController@update');
-        //Route::delete('users/{id}', 'UserController@delete');
-
-        // Post actions for authenticated users
-        //Route::post('posts', 'PostController@store');
-        //Route::put('posts/{id}', 'PostController@update');
-        //Route::delete('posts/{id}', 'PostController@destroy');
-
-        // Any other routes that require authentication
     });
 });
 
