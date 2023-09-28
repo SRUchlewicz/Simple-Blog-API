@@ -37,6 +37,18 @@ interface ResetPasswordControllerInterface
      *         )
      *     ),
      *     @OA\Response(
+     *         response=404,
+     *         description="Not Found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="User with such email not found"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
      *         response=500,
      *         description="Internal Server Error",
      *         @OA\JsonContent(
@@ -99,6 +111,18 @@ interface ResetPasswordControllerInterface
      *                 property="error",
      *                 type="string",
      *                 example="Error Message"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not Found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="User with such email not found"
      *             )
      *         )
      *     ),

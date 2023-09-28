@@ -15,6 +15,8 @@ use App\Contracts\Services\TokenServiceInterface;
 use App\Services\TokenService;
 use App\Contracts\Services\ResetPasswordServiceInterface;
 use App\Services\ResetPasswordService;
+use App\Contracts\Services\RoleServiceInterface;
+use App\Services\RoleService;
 
 class AuthenticationServiceProvider extends ServiceProvider
 {
@@ -31,6 +33,7 @@ class AuthenticationServiceProvider extends ServiceProvider
         $this->app->bind(UserServiceInterface::class, UserService::class);
         $this->app->bind(TokenServiceInterface::class, TokenService::class);
         $this->app->bind(ResetPasswordServiceInterface::class, ResetPasswordService::class);
+        $this->app->bind(RoleServiceInterface::class, RoleService::class);
     }
 
     /**

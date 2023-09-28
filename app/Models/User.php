@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use App\Contracts\Models\UserInterface;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Models\Role;
+use App\Models\Post;
 
 class User extends Authenticatable implements JWTSubject, UserInterface
 {
@@ -45,6 +45,21 @@ class User extends Authenticatable implements JWTSubject, UserInterface
         'email_verified_at' => 'datetime',
     ];
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function hasRole($roleName): bool
+    {
+        return $this->role->name === $roleName;
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -52,6 +67,9 @@ class User extends Authenticatable implements JWTSubject, UserInterface
 
     public function getJWTCustomClaims()
     {
-        return [];
+        return [
+            'role' => $this->role->name,
+            'role_id' => $this->role->id
+        ];
     }
 }

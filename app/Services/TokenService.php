@@ -9,10 +9,12 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use App\Exceptions\InvalidTokenException;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use Tymon\JWTAuth\Payload;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TokenService implements TokenServiceInterface
 {
     public const RESET_PASSWORD_TOKEN_ACTION_KEY = 'password_reset';
+    public const RESET_PASSWORD_TOKEN_TTL_CONFIG_KEY = 'custom.reset_password_token_ttl';
 
     private $userRepository;
 
@@ -43,9 +45,12 @@ class TokenService implements TokenServiceInterface
         //$this->revokeTokenInDb(); // TODO implement revoke logic
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function createResetPasswordToken(string $email): string
     {
-        $user = $this->userRepository->findByEmail($email);
+        $user = $this->userRepository->getByEmail($email);
         $customClaims = [
             'email' => $email,
             'action' => self::RESET_PASSWORD_TOKEN_ACTION_KEY,
@@ -92,6 +97,24 @@ class TokenService implements TokenServiceInterface
     }
 
     /**
+     * @throws InvalidTokenException
+     */
+    public function getRoleNameFromToken(string $token): string
+    {
+        try {
+            $tokenData = $this->getDataFromToken($token);
+        } catch (JWTException $e) {
+            throw new InvalidTokenException("The token is invalid");
+        }
+
+        if (!isset($tokenData['role'])) {
+            throw new InvalidTokenException("The token does not have role data");
+        }
+
+        return $tokenData['role'];
+    }
+
+    /**
      * @throws JWTException
      */
     private function getDataFromToken(string $token): Payload
@@ -101,7 +124,7 @@ class TokenService implements TokenServiceInterface
 
     private function getResetPasswordTokenTTL(): int
     {
-        return (int) env('RESET_PASSWORD_TOKEN_TTL', 10);
+        return (int) config(self::RESET_PASSWORD_TOKEN_TTL_CONFIG_KEY);
     }
 
     private function revokeTokenInDb(): void

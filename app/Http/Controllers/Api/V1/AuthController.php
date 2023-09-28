@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use App\Exceptions\InsufficientPermissionsException;
 use Illuminate\Support\Facades\Log;
 
 class AuthController extends ApiController implements AuthControllerInterface
@@ -31,6 +32,8 @@ class AuthController extends ApiController implements AuthControllerInterface
             return response()->json(['token' => $token], 200);
         } catch (ValidationException $e) {
             return response()->json(['message' => 'Invalid credentials'], 401);
+        } catch (InsufficientPermissionsException $e) {
+            return response()->json(['message' => 'You do not have sufficient permissions'], 403);
         } catch (JWTException $e) {
             Log::error('An error occured during login: ' . $e->getMessage());
             return response()->json(['message' => 'Could not create token'], 500);

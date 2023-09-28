@@ -11,6 +11,7 @@ use App\Http\Requests\ResetPasswordRequest;
 use Illuminate\Http\JsonResponse;
 use Exception;
 use App\Exceptions\InvalidTokenException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 
 class ResetPasswordController extends ApiController implements ResetPasswordControllerInterface
@@ -34,6 +35,8 @@ class ResetPasswordController extends ApiController implements ResetPasswordCont
         try {
             $this->resetPasswordService->sendResetToken($request->validated()['email']);
             return response()->json(['message' => 'Reset token sent'], 200);
+        } catch(ModelNotFoundException $e) {
+            return response()->json(['message' => 'User with such email not found'], 404);
         } catch (Exception $e) {
             Log::error('An error occured during forgot password: ' . $e->getMessage());
             return response()->json(['message' => 'An error occurred'], 500);
@@ -52,6 +55,8 @@ class ResetPasswordController extends ApiController implements ResetPasswordCont
             return response()->json(['message' => 'Password reset successfully'], 200);
         } catch (InvalidTokenException $e) {
             return response()->json(['message' => 'Invalid Token', 'error' => $e->getMessage()], 400);
+        } catch(ModelNotFoundException $e) {
+            return response()->json(['message' => 'User with such email not found'], 404);
         } catch (Exception $e) {
             Log::error('An error occured during password reset: ' . $e->getMessage());
             return response()->json(['message' => 'An error occurred'], 500);

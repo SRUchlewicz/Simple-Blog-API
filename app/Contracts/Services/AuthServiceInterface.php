@@ -9,6 +9,7 @@ interface AuthServiceInterface
     /**
      * @throws ValidationException
      * @throws JWTException
+     * @throws InsufficientPermissionsException
      */
     public function login(array $credentials): string;
   

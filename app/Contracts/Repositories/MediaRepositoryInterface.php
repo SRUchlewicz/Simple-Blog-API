@@ -2,27 +2,22 @@
 
 namespace App\Contracts\Repositories;
 
-use App\Models\User;
+use App\Models\Media;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-interface UserRepositoryInterface
+interface MediaRepositoryInterface
 {
     /**
      * @throws ModelNotFoundException
      */
-    public function getById(int $id): User;
+    public function getById(int $id): Media;
+
+    public function create(array $data): Media;
 
     /**
      * @throws ModelNotFoundException
      */
-    public function getByEmail(string $email): User;
-
-    public function create(array $data): User;
-
-    /**
-     * @throws ModelNotFoundException
-     */
-    public function update(int $id, array $data): User;
+    public function update(int $id, array $data): Media;
 
     /**
      * @throws ModelNotFoundException

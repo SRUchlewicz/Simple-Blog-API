@@ -4,17 +4,24 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EloquentUserRepository implements UserRepositoryInterface
 {
-    public function findById(int $id): ?User
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function getById(int $id): User
     {
-        return User::find($id);
+        return User::findOrFail($id);
     }
 
-    public function findByEmail(string $email): ?User
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function getByEmail(string $email): User
     {
-        return User::where('email', $email)->first();
+        return User::where('email', $email)->firstOrFail();
     }
 
     public function create(array $data): User
@@ -22,14 +29,22 @@ class EloquentUserRepository implements UserRepositoryInterface
         return User::create($data);
     }
 
-    public function update(User $user, array $data): User
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function update(int $id, array $data): User
     {
+        $user = $this->getById($id);
         $user->update($data);
         return $user;
     }
 
-    public function delete(User $user): void
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function delete(int $id): void
     {
+        $user = $this->getById($id);
         $user->delete();
     }
 }

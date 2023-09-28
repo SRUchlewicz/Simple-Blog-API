@@ -4,6 +4,7 @@ namespace App\Contracts\Services;
 
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Exceptions\InvalidTokenException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 interface TokenServiceInterface
 {
@@ -17,6 +18,9 @@ interface TokenServiceInterface
      */
     public function invalidate(?string $token = null): void;
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function createResetPasswordToken(string $email): string;
 
     /**
@@ -28,4 +32,9 @@ interface TokenServiceInterface
      * @throws InvalidTokenException
      */
     public function getEmailFromToken(string $token): string;
+
+    /**
+     * @throws InvalidTokenException
+     */
+    public function getRoleNameFromToken(string $token): string;
 }

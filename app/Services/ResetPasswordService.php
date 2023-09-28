@@ -8,6 +8,7 @@ use App\Contracts\Services\UserServiceInterface;
 use App\Mail\ResetPasswordMail;
 use Illuminate\Support\Facades\Mail;
 use App\Exceptions\InvalidTokenException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ResetPasswordService implements ResetPasswordServiceInterface
 {
@@ -22,6 +23,9 @@ class ResetPasswordService implements ResetPasswordServiceInterface
         $this->userService = $userService;
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function sendResetToken(string $email): void
     {
         Mail::to($email)->send(
@@ -31,6 +35,7 @@ class ResetPasswordService implements ResetPasswordServiceInterface
 
     /**
      * @throws InvalidTokenException
+     * @throws ModelNotFoundException
      */
     public function resetPassword(string $token, string $newPass): void
     {
