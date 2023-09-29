@@ -8,6 +8,7 @@ use App\Http\Requests\UploadMediaRequest;
 use Illuminate\Http\JsonResponse;
 use App\Contracts\Services\MediaServiceInterface;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\ProcessImage;
 
 class MediaController extends ApiController implements MediaControllerInterface
 {
@@ -22,7 +23,8 @@ class MediaController extends ApiController implements MediaControllerInterface
     public function upload(UploadMediaRequest $request): JsonResponse
     {
         try {
-            $this->mediaService->uploadMedia($request->file('image'));
+            $media = $this->mediaService->uploadMedia($request->file('image'));
+            ProcessImage::dispatch($media);
             return response()->json(['message' => 'Media created successfully'], 201);
         } catch (\Exception $e) {
             Log::error('An error occurred during media creation: ' . $e->getMessage());

@@ -11,6 +11,8 @@ use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Exceptions\InsufficientPermissionsException;
 use Illuminate\Support\Facades\Log;
+use App\Events\UserLoggedIn;
+use App\Events\UserLoggedOut;
 
 class AuthController extends ApiController implements AuthControllerInterface
 {
@@ -29,6 +31,7 @@ class AuthController extends ApiController implements AuthControllerInterface
     {
         try {
             $token = $this->authService->login($request->all());
+            event(new UserLoggedIn(auth()->user()));
             return response()->json(['token' => $token], 200);
         } catch (ValidationException $e) {
             return response()->json(['message' => 'Invalid credentials'], 401);
@@ -46,7 +49,9 @@ class AuthController extends ApiController implements AuthControllerInterface
     public function logout(): JsonResponse
     {
         try {
+            $user = auth()->user();
             $this->authService->logout();
+            event(new UserLoggedOut($user));
             return response()->json(['message' => 'Logged out successfully'], 200);
         } catch (JWTException $e) {
             Log::error('An error occured during logout: ' . $e->getMessage());

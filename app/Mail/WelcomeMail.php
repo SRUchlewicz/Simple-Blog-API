@@ -6,24 +6,25 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use App\Models\User;
 
-class ResetPasswordMail extends Mailable implements ShouldQueue
+class WelcomeMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $token;
+    private $user;
 
     public function __construct(
-        string $token
+        User $user
     ) {
-        $this->token = $token;
+        $this->user = $user;
     }
-    
-    public function build(): self
+
+    public function build()
     {
-        return $this->view('email.reset_password')
+        return $this->view('email.welcome')
                     ->with([
-                        'token' => $this->token,
+                        'user_name' => $this->user->firstname,
                     ]);
     }
 }

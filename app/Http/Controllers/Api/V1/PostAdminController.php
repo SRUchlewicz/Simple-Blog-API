@@ -12,6 +12,8 @@ use App\Contracts\Services\PostServiceInterface;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Events\PostCreated;
+use App\Events\PostUpdated;
 
 class PostAdminController extends ApiController implements PostAdminControllerInterface
 {
@@ -39,7 +41,8 @@ class PostAdminController extends ApiController implements PostAdminControllerIn
         try {
             $data = $request->validated();
             $data['user_id'] = $request->user()->id;
-            $this->postService->createPost($data);
+            $post = $this->postService->createPost($data);
+            event(new PostCreated($post));
             return response()->json(['message' => 'Post created successfully'], 201);
         } catch (Exception $e) {
             Log::error('An error occurred during post creation: ' . $e->getMessage());
@@ -64,6 +67,7 @@ class PostAdminController extends ApiController implements PostAdminControllerIn
     {
         try {
             $post = $this->postService->updatePost($id, $request->validated());
+            event(new PostUpdated($post));
             return response()->json(['message' => 'Post updated successfully'], 200);
         } catch(ModelNotFoundException $e) {
             return response()->json(['message' => 'Post not found'], 404);
@@ -76,7 +80,7 @@ class PostAdminController extends ApiController implements PostAdminControllerIn
     public function destroy($id): JsonResponse
     {
         try {
-            $post = $this->postService->deletePost($id);
+            $this->postService->deletePost($id);
             return response()->json(['message' => 'Post deleted successfully'], 200);
         } catch(ModelNotFoundException $e) {
             return response()->json(['message' => 'Post not found'], 404);
