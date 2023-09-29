@@ -1,64 +1,179 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Simple Blog API
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Description
 
-## About Laravel
+This is a Simple Blog API built using PHP 8, Laravel 8, MySQL 8, Redis, WSS, and JWT tokens. It features user registration, login, and logout, as well as CRUD operations for blog posts and users.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Table of Contents
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Authentication](#authentication)
+- [Endpoints](#endpoints)
+- [Roles and Privileges](#roles-and-privileges)
+- [Built With](#built-with)
+- [Contributing](#contributing)
+- [License](#license)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Installation
 
-## Learning Laravel
+```bash
+# Clone the repository
+git clone https://github.com/SRUchlewicz/Simple-Blog-API.git
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+# Navigate into the directory
+cd simple-blog-api
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Install dependencies
+composer install
 
-## Laravel Sponsors
+# Copy .env.example to .env
+cp .env.example .env
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+# Generate application key
+php artisan key:generate
 
-### Premium Partners
+# Run migrations and seed the database
+php artisan migrate
+Php artisan db:seer RolesTableSeeder
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+# link storage
+php artisan storage:link
+
+# Start the server
+php artisan serve
+```
+
+## Configuration
+
+This application relies on several services and configurations to work correctly. Make sure you have the following services running and configured in your `.env` file:
+
+### Horizon
+
+[Laravel Horizon](https://laravel.com/docs/8.x/horizon) is used for managing queues. Make sure you install it and run it:
+
+```bash
+php artisan horizon
+```
+
+### Redis
+
+The application uses [Redis](https://redis.io/) for caching and as a queue driver. Make sure Redis is installed and running. Update the following `.env` settings accordingly:
+
+```env
+REDIS_HOST=your_redis_host
+REDIS_PASSWORD=your_redis_password
+REDIS_PORT=your_redis_port
+```
+
+### Queue Worker
+
+Laravel's [queue worker](https://laravel.com/docs/8.x/queues#running-the-queue-worker) is used for background job processing. Make sure to run the queue worker:
+
+```bash
+php artisan queue:work
+```
+
+### WebSockets (WSS)
+
+For real-time features, the application uses WebSockets. Configure the WebSocket settings in your `.env`:
+
+```env
+WEBSOCKET_BROADCAST_HOST=your_websocket_host
+WEBSOCKET_BROADCAST_PORT=your_websocket_port
+WEBSOCKET_BROADCAST_SCHEME=your_websocket_scheme
+```
+
+### JWT Secret
+
+JWT authentication is used, make sure to generate a JWT secret key:
+
+```bash
+php artisan jwt:secret
+```
+
+And update your `.env`:
+
+```env
+JWT_SECRET=your_generated_jwt_secret
+```
+
+### Custom Configurations
+
+The application has a few custom configurations for features like password reset token TTL, roles allowed for login, and pagination. Update these in your `.env`:
+
+```env
+RESET_PASSWORD_TOKEN_TTL=your_value_in_minutes
+ALLOWED_ROLES_FOR_LOGIN=role1,role2
+NUMBER_OF_ENTITIES_PER_PAGE=your_pagination_value
+```
+
+
+## Usage
+
+### Base URL
+Local development: `http://localhost:8000/api/v1`
+
+### Examples
+
+#### Register a User
+```bash
+curl --request POST \
+  --url http://localhost:8000/api/v1/register \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"firstname": "johndoe",
+	"email": "john.doe@email.com",
+	"password": "yourpassword"
+}'
+```
+
+#### Create a Post
+```bash
+# You will need a valid JWT token here
+curl --request POST \
+  --url http://localhost:8000/api/vi/posts \
+  --header 'Authorization: Bearer YOUR_JWT_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"title": "My first post",
+	"body": "This is the content of my first post."
+}'
+```
+
+## Authentication
+
+The API uses JWT for authentication. Obtain a token by logging in, and use the token in the `Authorization` header for subsequent requests.
+
+## Endpoints
+
+For detailed endpoint documentation, refer to the auto-generated Swagger documentation available at `http://localhost:8000/api/documentation`.
+
+## Roles and Privileges
+
+The API supports multiple roles:
+- User: Currently nothing
+- Editor: Inherits User privileges, can create, edit, delete and list posts.
+- Admin: Inherits all privilege and can manage users.
+
+## Built With
+
+- PHP 8
+- Laravel 8
+- MySQL 8
+- Redis
+- WSS
+- JWT
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+To contribute to this project, please make a fork, create a feature branch, and submit a pull request.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the MIT License.
+
+---
+
+Feel free to modify this template to better suit the specifics of your project.

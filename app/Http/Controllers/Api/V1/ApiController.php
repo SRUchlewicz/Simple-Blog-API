@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 
 /**
  * @OA\Info(
- *   title="My API",
+ *   title="Blog API",
  *   version="1.0",
- *   description="A description of my API",
+ *   description="A Simple Blog API",
  *   @OA\Contact(
- *     email="support@example.com",
- *     name="Support Team"
+ *     email="sebastian.ruchlewicz@gmail.com",
+ *     name="Sebastian Ruchlewicz"
  *   )
  * )
  * @OA\SecurityScheme(
