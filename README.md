@@ -173,7 +173,3 @@ To contribute to this project, please make a fork, create a feature branch, and 
 ## License
 
 This project is licensed under the MIT License.
-
----
-
-Feel free to modify this template to better suit the specifics of your project.
