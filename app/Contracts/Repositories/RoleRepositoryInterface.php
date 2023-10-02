@@ -17,6 +17,4 @@ interface RoleRepositoryInterface
      * @throws ModelNotFoundException
      */
     public function getDefaultRoleId(): int;
-
-    public function getByNames(array $names): Collection;
 }

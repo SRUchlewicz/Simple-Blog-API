@@ -24,9 +24,4 @@ class EloquentRoleRepository implements RoleRepositoryInterface
     {
         return Role::where('name', Role::DEFAULT_ROLE)->firstOrFail()->id;
     }
-
-    public function getByNames(array $names): Collection
-    {
-        return Role::whereIn('name', $names)->get();
-    }
 }
