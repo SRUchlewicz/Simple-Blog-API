@@ -39,7 +39,7 @@ interface UserControllerInterface
      *                     type="array",
      *                     @OA\Items(ref="#/components/schemas/User")
      *                 )
-     *             )      
+     *             )
      *         )
      *     ),
      *     @OA\Response(

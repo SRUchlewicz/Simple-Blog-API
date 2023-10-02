@@ -67,7 +67,7 @@ class TokenService implements TokenServiceInterface
     {
         try {
             $tokenData = $this->getDataFromToken($token);
-        } catch(TokenExpiredException $e) {
+        } catch (TokenExpiredException $e) {
             throw new InvalidTokenException("The reset password token has expired");
         } catch (JWTException $e) {
             throw new InvalidTokenException("The reset password token is invalid");

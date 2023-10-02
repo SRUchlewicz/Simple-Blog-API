@@ -50,7 +50,7 @@ class UserController extends ApiController implements UserControllerInterface
         try {
             $user = $this->userService->getUserById($id);
             return response()->json(['user' => $user], 200);
-        } catch(ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'User not found'], 404);
         } catch (Exception $e) {
             Log::error('An error occurred during getting user: ' . $e->getMessage());
@@ -63,7 +63,7 @@ class UserController extends ApiController implements UserControllerInterface
         try {
             $post = $this->userService->updateUser($id, $request->validated());
             return response()->json(['message' => 'User updated successfully'], 200);
-        } catch(ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'User not found'], 404);
         } catch (Exception $e) {
             Log::error('An error occurred during user update: ' . $e->getMessage());
@@ -76,7 +76,7 @@ class UserController extends ApiController implements UserControllerInterface
         try {
             $post = $this->userService->deleteUser($id);
             return response()->json(['message' => 'User deleted successfully'], 200);
-        } catch(ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'User not found'], 404);
         } catch (Exception $e) {
             Log::error('An error occurred during user delete: ' . $e->getMessage());

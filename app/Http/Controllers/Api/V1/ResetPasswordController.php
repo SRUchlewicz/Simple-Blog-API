@@ -35,7 +35,7 @@ class ResetPasswordController extends ApiController implements ResetPasswordCont
         try {
             $this->resetPasswordService->sendResetToken($request->validated()['email']);
             return response()->json(['message' => 'Reset token sent'], 200);
-        } catch(ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'User with such email not found'], 404);
         } catch (Exception $e) {
             Log::error('An error occured during forgot password: ' . $e->getMessage());
@@ -55,7 +55,7 @@ class ResetPasswordController extends ApiController implements ResetPasswordCont
             return response()->json(['message' => 'Password reset successfully'], 200);
         } catch (InvalidTokenException $e) {
             return response()->json(['message' => 'Invalid Token', 'error' => $e->getMessage()], 400);
-        } catch(ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'User with such email not found'], 404);
         } catch (Exception $e) {
             Log::error('An error occured during password reset: ' . $e->getMessage());

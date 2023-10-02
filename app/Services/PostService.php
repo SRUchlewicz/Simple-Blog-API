@@ -62,7 +62,7 @@ class PostService implements PostServiceInterface
     {
         return DB::transaction(function () use ($id, $data) {
             $post = $this->postRepository->update(
-                $id, 
+                $id,
                 [
                     'title' => $data['title'],
                     'body' => $data['body']

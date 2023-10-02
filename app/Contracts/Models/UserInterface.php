@@ -37,7 +37,7 @@ namespace App\Contracts\Models;
  *         format="password"
  *     )
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="User",
  *     required={"firstname", "email", "role"},

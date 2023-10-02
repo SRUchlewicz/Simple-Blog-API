@@ -55,7 +55,7 @@ class PostAdminController extends ApiController implements PostAdminControllerIn
         try {
             $post = $this->postService->getPostById($id);
             return response()->json(['post' => $post], 200);
-        } catch(ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Post not found'], 404);
         } catch (Exception $e) {
             Log::error('An error occurred during getting post: ' . $e->getMessage());
@@ -69,7 +69,7 @@ class PostAdminController extends ApiController implements PostAdminControllerIn
             $post = $this->postService->updatePost($id, $request->validated());
             event(new PostUpdated($post));
             return response()->json(['message' => 'Post updated successfully'], 200);
-        } catch(ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Post not found'], 404);
         } catch (Exception $e) {
             Log::error('An error occurred during post update: ' . $e->getMessage());
@@ -82,7 +82,7 @@ class PostAdminController extends ApiController implements PostAdminControllerIn
         try {
             $this->postService->deletePost($id);
             return response()->json(['message' => 'Post deleted successfully'], 200);
-        } catch(ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Post not found'], 404);
         } catch (Exception $e) {
             Log::error('An error occurred during post delete: ' . $e->getMessage());

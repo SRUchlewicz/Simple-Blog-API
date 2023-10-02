@@ -36,7 +36,7 @@ interface PostControllerInterface
      *                     type="array",
      *                     @OA\Items(ref="#/components/schemas/Post")
      *                 )
-     *             )      
+     *             )
      *         )
      *     ),
      *     @OA\Response(
